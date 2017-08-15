@@ -54,15 +54,16 @@ class pySideTest_Class(ui_base, ui_form):
         self.cb_project.activated.connect(lambda: self.refresh_shot_name())
         self.cb_sequence_name.activated.connect(lambda: self.refresh_shot_name())
 
-        self.cb_assets_type.addItems(['props', 'element2d', 'environment', 'character'])
-        self.cb_assets_task_name.addItems(['mdl', 'shd', 'txt', 'rig', 'mgfx'])
+        self.cb_assets_type.addItems(['props', 'element2d', 'environment', 'character', 'creature'])
+        self.cb_assets_task_name.addItems(['mdl', 'shd', 'txt', 'rig', 'fur', 'mgfx'])
         self.pb_add_assets.clicked.connect(lambda: self.add_assets_dir())
 
-        self.cb_shot_task_name.addItems(['comp', 'comp_roto', 'comp_slap', 'mp', 'anim', 'cgfx', 'layout', 'lgt', 'mm'])
+        self.cb_shot_task_name.addItems(['comp', 'comp-roto', 'comp-paint', 'comp-slap', 'mgfx', 'mp', 'anim', 'fx', 'layout', 'lgt', 'mm'])
 
         self.pb_add_shot.clicked.connect(lambda: self.add_shot_dir())
         self.pb_add_basic.clicked.connect(lambda: self.add_basic_dir())
         self.pb_create_folder.clicked.connect(lambda: self.create_dir())
+        self.pb_delete_folder.clicked.connect(lambda: self.clear_path())
 
     def refresh_sequence_name(self):
         self.cb_sequence_name.clear()
@@ -86,16 +87,24 @@ class pySideTest_Class(ui_base, ui_form):
             return 'crt_'
         elif assets_type_abbr == 'environment':
             return 'env_'
-
+        elif assets_type_abbr == 'creature':
+            return 'crt_'
 
     def create_dir(self):
         file_path = []
-        for index in self.lw_create_path_list.findItems("",QtCore.Qt.MatchContains):
+        for index in self.lw_create_path_list.findItems("", QtCore.Qt.MatchContains):
             file_path.append(index.text())
             print index.text()
         for f in file_path:
             if not os.path.exists(f):
                 os.makedirs(f)
+
+        self.lw_create_path_list.clear()
+        self.lw_create_task_list.clear()
+
+    def clear_path(self):
+        self.lw_create_path_list.clear()
+        self.lw_create_task_list.clear()
 
     def add_assets_dir(self):
         file_path = self.get_x_assets_path() + self.get_y_assets_path()
@@ -176,7 +185,6 @@ class pySideTest_Class(ui_base, ui_form):
         y_assets_path = FK_RENDER_PATH + "\\" + project_name + "\\" + "_library" + "\\" + "assets" + "\\" + assets_type + "\\" + assets_name + "\\" + 'renders' + "\\" + task_name
         return [y_assets_path]
 
-
     def get_x_shot_path(self):
         project_name = self.cb_project.currentText()
         sequence_name = self.cb_sequence_name.currentText()
@@ -184,13 +192,17 @@ class pySideTest_Class(ui_base, ui_form):
         task_type = 'noneType'
         task_name = self.cb_shot_task_name.currentText()
 
-        if task_name in ['comp', 'comp_roto', 'comp_slap', 'mp']:
+        if task_name in ['comp', 'comp-roto', 'comp-slap', 'comp-paint', 'mgfx', 'mp']:
             task_type = '2d'
-        elif task_name in ['anim', 'cgfx', 'layout', 'lgt', 'mm']:
+        elif task_name in ['anim', 'fx', 'layout', 'lgt', 'mm']:
             task_type = '3d'
 
-        x_shot_path = FK_PROJECT_PATH + "\\" + project_name + "\\" + sequence_name + "\\" + shot_name + "\\" + task_type + "\\" + task_name
-        return [x_shot_path]
+        x_shot_path_temp = FK_PROJECT_PATH + "\\" + project_name + "\\" + sequence_name + "\\" + shot_name + "\\" + task_type + "\\" + task_name
+        x_shot_path_publish = x_shot_path_temp + "\\" + '_publish'
+        x_shot_path_workaera = x_shot_path_temp + "\\" + '_workaera'
+        x_shot_path_export = [x_shot_path_temp + "\\" + r'_export\abc', x_shot_path_temp + "\\" + r'_export\fbx', x_shot_path_temp + "\\" + r'_export\obj', x_shot_path_temp + "\\" + r'_export\cam']
+        x_shot_path = [x_shot_path_temp, x_shot_path_publish, x_shot_path_workaera] + x_shot_path_export
+        return x_shot_path
 
     def get_y_shot_path(self):
         project_name = self.cb_project.currentText()
@@ -199,33 +211,41 @@ class pySideTest_Class(ui_base, ui_form):
         task_type = 'noneType'
         task_name = self.cb_shot_task_name.currentText()
 
-        if task_name in ['comp', 'comp_roto', 'comp_slap', 'mp']:
+        if task_name in ['comp', 'comp-roto', 'comp-slap', 'comp-paint', 'mgfx', 'mp']:
             task_type = '2d'
         elif task_name in ['anim', 'cgfx', 'layout', 'lgt', 'mm']:
             task_type = '3d'
 
-        y_shot_path = FK_RENDER_PATH + "\\" + project_name + "\\" + sequence_name + "\\" + shot_name + "\\" + task_type + "\\" + task_name
-        return [y_shot_path]
+        y_shot_path_temp = FK_RENDER_PATH + "\\" + project_name + "\\" + sequence_name + "\\" + shot_name + "\\" + 'elements' + "\\" + task_type + "\\" + task_name + "\\" + 'v001'
+        y_shot_path_fullres = y_shot_path_temp + "\\" + 'fullres'
+        y_shot_path_proxymov = y_shot_path_temp + "\\" + 'proxy-mov'
+        y_shot_path = [y_shot_path_fullres, y_shot_path_proxymov]
+
+        return y_shot_path
 
     def get_basic_path(self):
 
         project_name = self.cb_project.currentText()
 
-        w_basic_edit = FK_PLATE_PATH + "\\" + project_name + "\\" + '_edit'
+        w_basic_edit = FK_PLATE_PATH + "\\" + project_name + "\\" + '_work' + '\\' + 'edit'
         w_basic_input = FK_PLATE_PATH + "\\" + project_name + "\\" + '_input'
         w_basic_output = FK_PLATE_PATH + "\\" + project_name + "\\" + '_output'
         w_basic_work = [FK_PLATE_PATH + "\\" + project_name + "\\" + '_work' + "\\" + 'doc', FK_PLATE_PATH + "\\" + project_name + "\\" + '_work' + "\\" + 'refrence']
         w_basic_temp = FK_PLATE_PATH + "\\" + project_name + "\\" + '_temp'
-        w_basic_example_temp = FK_PLATE_PATH + "\\" + project_name + "\\" + 'example' + "\\" + '0000' + "\\" + 'elements' + "\\" + 'plates'
-        w_basic_example = [w_basic_example_temp + "\\" + 'plate', w_basic_example_temp + "\\" + 'plate_cutref', w_basic_example_temp + "\\" + 'plate_ud']
-        w_basic_path = [w_basic_edit, w_basic_input, w_basic_output, w_basic_temp] + w_basic_work + w_basic_example
+        w_basic_example_temp_plate = FK_PLATE_PATH + "\\" + project_name + "\\" + 'example' + "\\" + '0000' + "\\" + 'elements' + "\\" + 'plates' + "\\" + 'plate' + "\\" + 'v001'
+        w_basic_example_temp_platebg = FK_PLATE_PATH + "\\" + project_name + "\\" + 'example' + "\\" + '0000' + "\\" + 'elements' + "\\" + 'plates' + "\\" + 'plate-bg' + "\\" + 'v001'
+        w_basic_example_temp_plateud = FK_PLATE_PATH + "\\" + project_name + "\\" + 'example' + "\\" + '0000' + "\\" + 'elements' + "\\" + 'plates' + "\\" + 'plate-ud' + "\\" + 'v001'
+        w_basic_hdr = FK_PLATE_PATH + "\\" + project_name + "\\" + '_work' + "\\" + 'hdr'
+        w_basic_lut = FK_PLATE_PATH + "\\" + project_name + "\\" + '_work' + "\\" + 'lut'
+        w_basic_example_plate = [w_basic_example_temp_plate + "\\" + 'fullres', w_basic_example_temp_plate + "\\" + 'proxy-jpg']
+        w_basic_example_platebg = [w_basic_example_temp_platebg + "\\" + 'fullres', w_basic_example_temp_platebg + "\\" + 'proxy-jpg']
+        w_basic_example_plateud = [w_basic_example_temp_plateud + "\\" + 'fullres', w_basic_example_temp_plateud + "\\" + 'proxy-jpg']
+        w_basic_path = [w_basic_edit, w_basic_input, w_basic_output, w_basic_temp, w_basic_hdr, w_basic_lut] + w_basic_work + w_basic_example_plate + w_basic_example_platebg + w_basic_example_plateud
 
         x_basic_temp = FK_PROJECT_PATH + "\\" + project_name + "\\" + '_temp'
         x_basic_concept = FK_PROJECT_PATH + "\\" + project_name + "\\" + '_library' + "\\" + 'concept'
-        x_basic_hdr = FK_PROJECT_PATH + "\\" + project_name + "\\" + '_library' + "\\" + 'hdr'
-        x_basic_lut = FK_PROJECT_PATH + "\\" + project_name + "\\" + '_library' + "\\" + 'lut'
         x_basic_previz = FK_PROJECT_PATH + "\\" + project_name + "\\" + '_library' + "\\" + 'previz'
-        x_basic_path = [x_basic_temp, x_basic_concept, x_basic_hdr, x_basic_lut, x_basic_previz]
+        x_basic_path = [x_basic_temp, x_basic_concept, x_basic_previz]
 
         y_basic_temp = FK_RENDER_PATH + "\\" + project_name + "\\" + '_temp'
         y_basic_daily = FK_RENDER_PATH + "\\" + project_name + "\\" + '_daily'
@@ -235,6 +255,13 @@ class pySideTest_Class(ui_base, ui_form):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
+
+    """
+
+    if a QApplication already exist please use QtGui.QApplication.instance()
+
+    """
+
     gui = pySideTest_Class()
     gui.show()
     app.exec_()
