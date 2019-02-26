@@ -25,7 +25,6 @@ UiWidget::UiWidget(QWidget* parent)
 
 	envPluginPath = MCommonSystemUtils::getEnv("PYRAMID_LOCATION").asChar();
 
-	// 遍历提供的预览模型
 	comboBox_modelList->clear();
 	QDir dir(QString(envPluginPath.c_str()) + "/viewObj");
 	if (dir.exists())
@@ -40,7 +39,6 @@ UiWidget::UiWidget(QWidget* parent)
 		}
 	}
 
-	// 添加OpenGL窗体
 	ClassMainOglWidget* openGLWidget = new ClassMainOglWidget(widgetGL);
 	openGLWidget->mainWidget = this;
 	openGLWidget->inputPluginPath = envPluginPath;
@@ -52,7 +50,6 @@ UiWidget::UiWidget(QWidget* parent)
 	connect(comboBox_modelList, SIGNAL(currentIndexChanged(QString)),
 		openGLWidget, SLOT(setupViewModel(QString)));
 
-	// 添加带颜色的属性
 	QSizePolicy sizePolicy2(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	sizePolicy2.setHorizontalStretch(0);
 	sizePolicy2.setVerticalStretch(0);
@@ -212,8 +209,6 @@ UiWidget::UiWidget(QWidget* parent)
 	colorViewWidget_coatSpecularColor->setColor();
 	colorViewWidget_emissionColor->color = QColor(0.0, 0.0, 0.0);
 	colorViewWidget_emissionColor->setColor();
-
-	// 滑块数值改变绑定
 
 	/* Diffuse Weight */
 	lineEdit_diffuseWeight->setValidator(new QDoubleValidator(0.0, 1.0, 2, this));
@@ -405,8 +400,6 @@ UiWidget::UiWidget(QWidget* parent)
 	connect(horizontalSlider_light1_positionz, SIGNAL(valueChanged(int)),
 		this, SLOT(on_horizontalSlider_light1_positionz_valueChanged(int)));
 
-	// 颜色块儿改变绑定
-
 	/* Diffuse Color */
 	connect(colorViewWidget_diffuseColor, SIGNAL(colorHasChanged(QColor)),
 		openGLWidget, SLOT(on_diffuseColor_valueChanged(QColor)));
@@ -439,7 +432,6 @@ UiWidget::UiWidget(QWidget* parent)
 	connect(colorViewWidget_emissionColor, SIGNAL(colorHasChanged(QColor)),
 		openGLWidget, SLOT(on_emissionColor_valueChanged(QColor)));
 
-	// 贴图路径改变绑定
 	connect(lineEdit_specularMapPath, SIGNAL(textChanged(QString)),
 		openGLWidget, SLOT(on_lineEdit_specularMapPath_textChanged(QString)));
 	connect(lineEdit_transmissionMapPath, SIGNAL(textChanged(QString)),
@@ -470,7 +462,6 @@ UiWidget::UiWidget(QWidget* parent)
 	connect(this, SIGNAL(sendDataQString2(QString, QString, QString)),
 		openGLWidget, SLOT(on_pushButton_updateShader_sendData(QString, QString, QString)));
 
-	// 设置UI材质球属性默认值
 	lineEdit_diffuseWeight->setText("1.0");
 	horizontalSlider_diffuseWeight->setValue(100);
 	lineEdit_diffuseRoughness->setText("0.0");
