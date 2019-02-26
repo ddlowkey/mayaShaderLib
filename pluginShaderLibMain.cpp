@@ -29,7 +29,7 @@ MStatus MainCmd::doIt(const MArgList&)
 
 MStatus initializePlugin(MObject plugin)
 {
-	MFnPlugin pluginFn(plugin, "y Frank Ding & Javier Yang", "1.0", "Any");
+	MFnPlugin pluginFn(plugin, "by Frank Ding & Javier Yang", "1.0", "Any");
 	CHECK_MSTATUS(pluginFn.registerCommand(MainCmd::commandName, MainCmd::creator));
 
 	return MS::kSuccess;
