@@ -21,7 +21,7 @@ bool ObjLoader::loadFromFile()
 
 	while (getline(file, line))
 	{
-		if (line.substr(0, 2) == "vt") // 顶点纹理坐标数据
+		if (line.substr(0, 2) == "vt")
 		{
 			std::istringstream s(line.substr(2));
 			glm::vec2 v;
@@ -29,21 +29,21 @@ bool ObjLoader::loadFromFile()
 			s >> v.y;
 			temp_textCoords.push_back(v);
 		}
-		else if (line.substr(0, 2) == "vn") // 顶点法向量数据
+		else if (line.substr(0, 2) == "vn")
 		{
 			std::istringstream s(line.substr(2));
 			glm::vec3 v;
 			s >> v.x; s >> v.y; s >> v.z;
 			temp_normals.push_back(v);
 		}
-		else if (line.substr(0, 1) == "v") // 顶点位置数据
+		else if (line.substr(0, 1) == "v")
 		{
 			std::istringstream s(line.substr(2));
 			glm::vec3 v;
 			s >> v.x; s >> v.y; s >> v.z;
 			temp_vertices.push_back(v);
 		}
-		else if (line.substr(0, 1) == "f") // 面数据
+		else if (line.substr(0, 1) == "f")
 		{
 			std::vector<Vertex> current3VertexInfo(3);
 			std::vector<VertexCombineIndex> current3VertexVertComIndex(3);
@@ -51,13 +51,13 @@ bool ObjLoader::loadFromFile()
 
 			std::istringstream vtns(line.substr(2));
 			std::string vtn;
-			while (vtns >> vtn) // 处理一行中多个顶点属性
+			while (vtns >> vtn)
 			{
 				VertexCombineIndex vertComIndex;
 				std::replace(vtn.begin(), vtn.end(), '/', ' ');
 				std::istringstream ivtn(vtn);
 
-				if (vtn.find("  ") != std::string::npos) // 没有纹理数据
+				if (vtn.find("  ") != std::string::npos)
 					return false;
 
 				ivtn >> vertComIndex.posIndex
@@ -113,12 +113,11 @@ bool ObjLoader::loadFromFile()
 
 			faceIndex++;
 		}
-		else if (line[0] == '#') // 注释忽略
+		else if (line[0] == '#')
 		{
 		}
 		else
 		{
-			// 其余内容 暂时不处理
 		}
 	}
 
